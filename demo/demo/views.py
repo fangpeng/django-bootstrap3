@@ -8,7 +8,7 @@ from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 
-from .forms import ContactForm, FilesForm
+from .forms import ContactForm, FilesForm, ContactFormSet
 
 
 # http://yuji.wordpress.com/2013/01/30/django-form-field-in-initial-data-requires-a-fieldfile-instance/
@@ -28,8 +28,18 @@ class HomePageView(TemplateView):
         return context
 
 
+class DefaultFormsetView(FormView):
+    template_name = 'demo/formset.html'
+    form_class = ContactFormSet
+
+
 class DefaultFormView(FormView):
     template_name = 'demo/form.html'
+    form_class = ContactForm
+
+
+class DefaultFormByFieldView(FormView):
+    template_name = 'demo/form_by_field.html'
     form_class = ContactForm
 
 
@@ -77,3 +87,8 @@ class PaginationView(TemplateView):
             show_lines = paginator.page(paginator.num_pages)
         context['lines'] = show_lines
         return context
+
+
+class MiscView(TemplateView):
+    template_name = 'demo/misc.html'
+

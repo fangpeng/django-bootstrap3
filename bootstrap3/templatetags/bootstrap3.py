@@ -2,16 +2,22 @@
 from __future__ import unicode_literals
 
 import re
+
 from math import floor
 
 from django import template
 from django.template.loader import get_template
 
-from ..bootstrap import css_url, javascript_url, jquery_url, theme_url, get_bootstrap_setting
+from ..bootstrap import (
+    css_url, javascript_url, jquery_url, theme_url, get_bootstrap_setting
+)
 from ..html import render_link_tag
-from ..forms import render_button, render_field, render_field_and_label, render_form, render_form_group, render_formset, \
-    render_label
-from ..icons import render_icon
+from ..forms import (
+    render_button, render_field, render_field_and_label, render_form,
+    render_form_group, render_formset,
+    render_label, render_form_errors, render_formset_errors
+)
+from ..components import render_icon, render_alert
 from ..templates import handle_var, parse_token_contents
 from ..text import force_text
 
@@ -23,7 +29,8 @@ register = template.Library()
 def bootstrap_setting(value):
     """
     A simple way to read bootstrap settings in a template.
-    Please consider this filter private for now, do not use it in your own templates.
+    Please consider this filter private for now, do not use it in your own
+    templates.
     """
     return get_bootstrap_setting(value)
 
@@ -39,7 +46,7 @@ def bootstrap_jquery_url():
 
     Default value: ``//code.jquery.com/jquery.min.js``
 
-    this value is configurable, see Settings section
+    This value is configurable, see Settings section
 
     **usage**::
 
@@ -55,11 +62,11 @@ def bootstrap_jquery_url():
 @register.simple_tag
 def bootstrap_javascript_url():
     """
-    Return the full url to FIXTHIS
+    Return the full url to the Bootstrap JavaScript library
 
     Default value: ``None``
 
-    this value is configurable, see Settings section
+    This value is configurable, see Settings section
 
     **Tag name**::
 
@@ -79,11 +86,11 @@ def bootstrap_javascript_url():
 @register.simple_tag
 def bootstrap_css_url():
     """
-    Return the full url to FIXTHIS
+    Return the full url to the Bootstrap CSS library
 
     Default value: ``None``
 
-    this value is configurable, see Settings section
+    This value is configurable, see Settings section
 
     **Tag name**::
 
@@ -103,11 +110,11 @@ def bootstrap_css_url():
 @register.simple_tag
 def bootstrap_theme_url():
     """
-    Return the full url to FIXTHIS
+    Return the full url to a Bootstrap theme CSS library
 
     Default value: ``None``
 
-    this value is configurable, see Settings section
+    This value is configurable, see Settings section
 
     **Tag name**::
 
@@ -128,12 +135,13 @@ def bootstrap_theme_url():
 def bootstrap_css():
     """
     Return HTML for Bootstrap CSS
-    Adjust url in settings. If no url is returned, we don't want this statement to return any HTML.
+    Adjust url in settings. If no url is returned, we don't want this statement
+    to return any HTML.
     This is intended behavior.
 
     Default value: ``FIXTHIS``
 
-    this value is configurable, see Settings section
+    This value is configurable, see Settings section
 
     **Tag name**::
 
@@ -148,19 +156,21 @@ def bootstrap_css():
         {% bootstrap_css %}
     """
     urls = [url for url in [bootstrap_css_url(), bootstrap_theme_url()] if url]
-    return ''.join([render_link_tag(url, media='screen') for url in urls])
+    return ''.join([render_link_tag(url) for url in urls])
 
 
 @register.simple_tag
-def bootstrap_javascript(jquery=False):
+def bootstrap_javascript(jquery=None):
     """
-    Return HTML for Bootstrap JavaScript
-    Adjust url in settings. If no url is returned, we don't want this statement to return any HTML.
+    Return HTML for Bootstrap JavaScript.
+
+    Adjust url in settings. If no url is returned, we don't want this
+    statement to return any HTML.
     This is intended behavior.
 
     Default value: ``None``
 
-    this value is configurable, see Settings section
+    This value is configurable, see Settings section
 
     **Tag name**::
 
@@ -168,19 +178,22 @@ def bootstrap_javascript(jquery=False):
 
     **Parameters**:
 
-        :jquery: True to include jquery FIXTHIS
+        :jquery: Truthy to include jQuery as well as Bootstrap
 
     **usage**::
 
-        {% bootstrap_javascript FIXTHIS %}
+        {% bootstrap_javascript %}
 
     **example**::
 
-        {% bootstrap_javascript FIXTHIS %}
+        {% bootstrap_javascript jquery=1 %}
     """
 
     javascript = ''
-    # No async on scripts, not mature enough. See issue #52 and #56
+    # See if we have to include jQuery
+    if jquery is None:
+        jquery = get_bootstrap_setting('include_jquery', False)
+    # NOTE: No async on scripts, not mature enough. See issue #52 and #56
     if jquery:
         url = bootstrap_jquery_url()
         if url:
@@ -208,14 +221,39 @@ def bootstrap_formset(*args, **kwargs):
 
     **usage**::
 
-        {% bootstrap_formset formset FIXTHIS %}
+        {% bootstrap_formset formset %}
 
     **example**::
 
-        {% bootstrap_formset formset FIXTHIS %}
+        {% bootstrap_formset formset layout='horizontal' %}
 
     """
     return render_formset(*args, **kwargs)
+
+
+@register.simple_tag
+def bootstrap_formset_errors(*args, **kwargs):
+    """
+    Render form errors
+
+    **Tag name**::
+
+        bootstrap_form_errors
+
+    **Parameters**:
+
+        :args:
+        :kwargs:
+
+    **usage**::
+
+        {% bootstrap_form_errors form %}
+
+    **example**::
+
+        {% bootstrap_form_errors form layout='inline' %}
+    """
+    return render_formset_errors(*args, **kwargs)
 
 
 @register.simple_tag
@@ -234,13 +272,38 @@ def bootstrap_form(*args, **kwargs):
 
     **usage**::
 
-        {% bootstrap_form form FIXTHIS %}
+        {% bootstrap_form form %}
 
     **example**::
 
-        {% bootstrap_form form FIXTHIS %}
+        {% bootstrap_form form layout='inline' %}
     """
     return render_form(*args, **kwargs)
+
+
+@register.simple_tag
+def bootstrap_form_errors(*args, **kwargs):
+    """
+    Render form errors
+
+    **Tag name**::
+
+        bootstrap_form_errors
+
+    **Parameters**:
+
+        :args:
+        :kwargs:
+
+    **usage**::
+
+        {% bootstrap_form_errors form %}
+
+    **example**::
+
+        {% bootstrap_form_errors form layout='inline' %}
+    """
+    return render_form_errors(*args, **kwargs)
 
 
 @register.simple_tag
@@ -259,11 +322,11 @@ def bootstrap_field(*args, **kwargs):
 
     **usage**::
 
-        {% bootstrap_field form_field FIXTHIS %}
+        {% bootstrap_field form_field %}
 
     **example**::
 
-        {% bootstrap_form form_field FIXTHIS %}
+        {% bootstrap_form form_field %}
     """
     return render_field(*args, **kwargs)
 
@@ -319,7 +382,7 @@ def bootstrap_button(*args, **kwargs):
 
 
 @register.simple_tag
-def bootstrap_icon(icon):
+def bootstrap_icon(icon, **kwargs):
     """
     Render an icon
 
@@ -340,7 +403,34 @@ def bootstrap_icon(icon):
         {% bootstrap_icon "star" %}
 
     """
-    return render_icon(icon)
+    return render_icon(icon, **kwargs)
+
+
+@register.simple_tag
+def bootstrap_alert(content, alert_type='info', dismissable=True):
+    """
+    Render an alert
+
+    **Tag name**::
+
+        bootstrap_alert
+
+    **Parameters**:
+
+        :content: HTML content of alert
+        :alert_type: one of 'info', 'warning', 'danger' or 'success'
+        :dismissable: boolean, is alert dismissable
+
+    **usage**::
+
+        {% bootstrap_alert "my_content" %}
+
+    **example**::
+
+        {% bootstrap_alert "Something went wrong" alert_type='error' %}
+
+    """
+    return render_alert(content, alert_type, dismissable)
 
 
 @register.tag('buttons')
@@ -405,7 +495,11 @@ class ButtonsNode(template.Node):
 @register.simple_tag(takes_context=True)
 def bootstrap_messages(context, *args, **kwargs):
     """
-    Show django.contrib.messages Messages in Bootstrap alert containers
+    Show django.contrib.messages Messages in Bootstrap alert containers.
+
+    In order to make the alerts dismissable (with the close button),
+    we have to set the jquery parameter too when using the
+    bootstrap_javascript tag.
 
     **Tag name**::
 
@@ -423,6 +517,7 @@ def bootstrap_messages(context, *args, **kwargs):
 
     **example**::
 
+        {% bootstrap_javascript jquery=1 %}
         {% bootstrap_messages FIXTHIS %}
 
     """
@@ -441,6 +536,7 @@ def bootstrap_pagination(page, **kwargs):
     **Parameters**:
 
         :page:
+        :parameter_name: Name of paging URL parameter (default: "page")
         :kwargs:
 
     **usage**::
@@ -458,14 +554,16 @@ def bootstrap_pagination(page, **kwargs):
 
 
 def get_pagination_context(page, pages_to_show=11,
-                           url=None, size=None, extra=None):
+                           url=None, size=None, extra=None,
+                           parameter_name='page'):
     """
     Generate Bootstrap pagination context from a page object
     """
     pages_to_show = int(pages_to_show)
     if pages_to_show < 1:
         raise ValueError("Pagination pages_to_show should be a positive " +
-                         "integer, you specified {pages}".format(pages=pages_to_show))
+                         "integer, you specified {pages}".format(
+                             pages=pages_to_show))
     num_pages = page.paginator.num_pages
     current_page = page.number
     half_page_num = int(floor(pages_to_show / 2)) - 1
@@ -504,8 +602,8 @@ def get_pagination_context(page, pages_to_show=11,
     if url:
         # Remove existing page GET parameters
         url = force_text(url)
-        url = re.sub(r'\?page\=[^\&]+', '?', url)
-        url = re.sub(r'\&page\=[^\&]+', '', url)
+        url = re.sub(r'\?{0}\=[^\&]+'.format(parameter_name), '?', url)
+        url = re.sub(r'\&{0}\=[^\&]+'.format(parameter_name), '', url)
         # Append proper separator
         if '?' in url:
             url += '&'
@@ -518,7 +616,7 @@ def get_pagination_context(page, pages_to_show=11,
         url += force_text(extra) + '&'
     if url:
         url = url.replace('?&', '?')
-    # Set CSS classes,see twitter.github.io/bootstrap/components.html#pagination
+    # Set CSS classes, see http://getbootstrap.com/components/#pagination
     pagination_css_classes = ['pagination']
     if size == 'small':
         pagination_css_classes.append('pagination-sm')
@@ -535,4 +633,5 @@ def get_pagination_context(page, pages_to_show=11,
         'pages_back': pages_back,
         'pages_forward': pages_forward,
         'pagination_css_classes': ' '.join(pagination_css_classes),
+        'parameter_name': parameter_name,
     }

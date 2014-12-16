@@ -3,6 +3,132 @@
 History
 -------
 
+
+5.0.3 (2014-12-02)
+++++++++++++++++++
+
+* Fixing tests for older Django and Python versions
+
+
+5.0.2 (2014-11-24)
+++++++++++++++++++
+
+* Cleaning up some mess in 5.0.1 created by PyPI malfunction
+
+
+5.0.1 (2014-11-21)
+++++++++++++++++++
+
+* Bug fixes and update to Bootstrap 3.3.1
+
+
+4.11.0 (2014-08-19)
++++++++++++++++++++
+
+* Improved handling and control of form classes for error and success
+
+
+4.10.1 (2014-08-18)
++++++++++++++++++++
+
+* Bug fixes, test fixes, documentation fixes
+
+
+4.10.0 (2014-08-12)
++++++++++++++++++++
+
+* Template tag `bootstrap_icon` now supports a `title` parameter
+
+
+4.9.2 (2014-08-11)
+++++++++++++++++++
+
+* Fixed bug causing problems with setting classes for horizontal forms
+
+
+4.9.1 (2014-08-10)
+++++++++++++++++++
+
+* Fixed test for Django 1.4
+
+
+4.9.0 (2014-08-09)
+++++++++++++++++++
+
+* New parameter `href` for `bootstrap_button`, if provided will render `a` tag instead of `button` tag
+
+
+4.8.2 (2014-07-10)
+++++++++++++++++++
+
+* Internal fixes to master branch
+
+
+4.8.1 (2014-07-10)
+++++++++++++++++++
+
+* Make extra classes override bootstrap defaults
+
+
+4.8.0 (2014-07-10)
+++++++++++++++++++
+
+* Introduced new setting `set_placeholder`, default True
+
+
+4.7.1 (2014-07-07)
+++++++++++++++++++
+
+* Fixed rendering of various sizes (as introduced in 4.7.0)
+* Upgrade to Bootstrap 3.2.0 as default version
+
+
+4.7.0 (2014-06-04)
+++++++++++++++++++
+
+* `size` option added to formsets, forms, fields and buttons
+
+
+4.6.0 (2014-05-22)
+++++++++++++++++++
+
+* new `bootstrap_formset_errors` tag
+
+
+4.5.0 (2014-05-21)
+++++++++++++++++++
+
+* bug fixes in formsets
+* new formset renderer
+* new `bootstrap_form_errors` tag
+
+
+4.4.2 (2014-05-20)
+++++++++++++++++++
+
+* documentation now mentions templates
+
+
+4.4.1 (2014-05-08)
+++++++++++++++++++
+
+* bug fixes
+* documentation fixes
+* test coverage on coveralls.io
+
+
+4.4.0 (2014-05-01)
+++++++++++++++++++
+
+* added `bootstrap_alert` template tag
+
+
+4.3.0 (2014-04-25)
+++++++++++++++++++
+
+* added `required_css_class` and `error_css_class` as optional settings (global) and parameters (form and field rendering)
+
+
 4.2.0 (2014-04-06)
 ++++++++++++++++++
 
@@ -91,7 +217,7 @@ History
 
 * project refactored
 * added skeleton for creating documentation (fix issue #30)
-* fixed FileField issues
+* fixed `FileField` issues
 
 
 

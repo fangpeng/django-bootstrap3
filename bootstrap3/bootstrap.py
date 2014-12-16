@@ -8,14 +8,22 @@ from django.utils.importlib import import_module
 # Default settings
 BOOTSTRAP3_DEFAULTS = {
     'jquery_url': '//code.jquery.com/jquery.min.js',
-    'base_url': '//netdna.bootstrapcdn.com/bootstrap/3.1.1/',
+    'base_url': '//netdna.bootstrapcdn.com/bootstrap/3.3.1/',
     'css_url': None,
     'theme_url': None,
     'javascript_url': None,
     'javascript_in_head': False,
+    'include_jquery': False,
     'horizontal_label_class': 'col-md-2',
     'horizontal_field_class': 'col-md-4',
     'set_required': True,
+    'set_placeholder': True,
+    'required_css_class': '',
+    'error_css_class': 'has-error',
+    'success_css_class': 'has-success',
+    'formset_renderers': {
+        'default': 'bootstrap3.renderers.FormsetRenderer',
+    },
     'form_renderers': {
         'default': 'bootstrap3.renderers.FormRenderer',
     },
@@ -57,14 +65,16 @@ def javascript_url():
     """
     Return the full url to the Bootstrap JavaScript file
     """
-    return get_bootstrap_setting('javascript_url') or bootstrap_url('js/bootstrap.min.js')
+    return get_bootstrap_setting('javascript_url') or \
+        bootstrap_url('js/bootstrap.min.js')
 
 
 def css_url():
     """
     Return the full url to the Bootstrap CSS file
     """
-    return get_bootstrap_setting('css_url') or bootstrap_url('css/bootstrap.min.css')
+    return get_bootstrap_setting('css_url') or \
+        bootstrap_url('css/bootstrap.min.css')
 
 
 def theme_url():
@@ -74,18 +84,23 @@ def theme_url():
     return get_bootstrap_setting('theme_url')
 
 
-def get_renderer(renderers, layout):
+def get_renderer(renderers, **kwargs):
+    layout = kwargs.get('layout', '')
     path = renderers.get(layout, renderers['default'])
     mod, cls = path.rsplit(".", 1)
     return getattr(import_module(mod), cls)
 
 
-def get_form_renderer(layout):
+def get_formset_renderer(**kwargs):
+    renderers = get_bootstrap_setting('formset_renderers')
+    return get_renderer(renderers, **kwargs)
+
+
+def get_form_renderer(**kwargs):
     renderers = get_bootstrap_setting('form_renderers')
-    return get_renderer(renderers, layout)
+    return get_renderer(renderers, **kwargs)
 
 
-def get_field_renderer(layout):
+def get_field_renderer(**kwargs):
     renderers = get_bootstrap_setting('field_renderers')
-    return get_renderer(renderers, layout)
-
+    return get_renderer(renderers, **kwargs)
